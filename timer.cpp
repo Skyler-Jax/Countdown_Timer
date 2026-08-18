@@ -4,26 +4,44 @@
 #include <thread>
 
 int hours = 0;
-int mins = 60;
+int mins = 0;
 int secs = 0;
 int clockTick = 0;
 
 int timer::getHours()
 {
-    std::cout << "Enter duration hours:" << std::endl;
+    std::cout << "Enter timer hours:" << std::endl;
     std::cin >> hours;
+    screen::clearScreen();
+    screen::displayHeader();
+    screen::displayClock(hours, mins, secs);
     return hours;
 }
 
 int timer::getMins()
 {
-    std::cout << "Enter duration minutes:" << std::endl;
+    std::cout << "Enter timer minutes:" << std::endl;
     std::cin >> mins;
     if (mins > 59 || mins < 0) {
-        std::cout << "Invalid input, enter 0-59 minutes.\n" << std::endl;
-        getMins();
+        timer::getMins();
     }
+    screen::clearScreen();
+    screen::displayHeader();
+    screen::displayClock(hours, mins, secs);
     return mins;
+}
+
+int timer::getSecs()
+{
+    std::cout << "Enter timer seconds:" << std::endl;
+    std::cin >> secs;
+    if (secs > 59 || secs < 0) {
+        timer::getSecs();
+    }
+    screen::clearScreen();
+    screen::displayHeader();
+    screen::displayClock(hours, mins, secs);
+    return secs;
 }
 
 void timer::timerClock()
@@ -47,17 +65,14 @@ void timer::timerCore(int timerSecs)
 {
     while (timerSecs >= 0) {
         screen::clearScreen();
-        screen::headerDisp();
-        std::cout << timerSecs << " Total seconds remaining." << std::endl << std::endl;
-        std::cout << "Countdown clock:" << std::endl;
-        if (hours < 10) std::cout << "0";
-        std::cout << hours << ":";
-        if (mins < 10) std::cout << "0";
-        std::cout << mins << ":";
-        if (secs < 10) std::cout << "0";
-        std::cout << secs << std::endl << std::endl;
+        screen::displayHeader();
+        screen::displayClock(hours, mins, secs);
+        screen::displaySecs(timerSecs);
         timer::timerClock();
         timerSecs--;
         continue;
     }
+    screen::clearScreen();
+    screen::displayHeader();
+    screen::displayClock(0, 0, 0);
 }
