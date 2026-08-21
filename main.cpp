@@ -1,10 +1,11 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.0       *
+ *     Version 1.1.3       *
  *  by Skyler Jax Hansen   *
- *     Aug. 19th, 2026     *
+ *     Aug. 21st, 2026     *
  ***************************/
 
+#include "variables.h"
 #include "functions.h"
 
 using namespace app;
@@ -13,8 +14,11 @@ using namespace display;
 
 int main()
 {
-    initApp();
+    zeroVars();
     while (programActive == true) {
+        initApp();
+        getNote();
+        wait2Start();
         timerCore(totalSecs);
         timerExpired();
         timerReset();

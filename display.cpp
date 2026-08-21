@@ -1,13 +1,14 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.0       *
+ *     Version 1.1.3       *
  *  by Skyler Jax Hansen   *
- *     Aug. 19th, 2026     *
+ *     Aug. 21st, 2026     *
  ***************************/
 
 /********************
  * Screen Functions *
  ********************/
+#include "variables.h"
 #include "functions.h"
 #include <iostream>
 #include <string>
@@ -18,9 +19,9 @@ using namespace app;
 // Clear the screen
 void display::clearScreen(bool timerSetMode)
 {
-    cout << "\033[2J\033[H" << flush;
+    cout << ANSI_ERASE << ANSI_CHIDE << flush;
     displayHeader();
-    displayClock(hours, mins, secs, clockHands, timerSetMode, areSetHours, areSetMins, areSetSecs);
+    displayClock(hours, mins, secs, clockHands, timerSetMode, hoursAreSet, minsAreSet, secsAreSet, iconColor);
 }
 
 // Draw program header on screen
@@ -31,15 +32,23 @@ void display::displayHeader()
     cout << " │ Console Countdown Clock │" << endl;
     cout << " ╰─────────────────────────╯" << endl;
     cout << ANSI_GREEN;
-    cout << "    ⓑⓨ🅢ⓚⓨⓛⓔⓡ🅙ⓐⓧ🅗ⓐⓝⓢⓔⓝ🄯⓴㉖" << endl << endl;
+    cout << "    ⓑⓨ🅢ⓚⓨⓛⓔⓡ🅙ⓐⓧ🅗ⓐⓝⓢⓔⓝ🄌🄯⓴㉖" << endl << endl;
     cout << ANSI_RESET;
 }
 
 // Draw clock on screen
-void display::displayClock(int hr, int min, int sec, int iconSelect, bool flashClock, bool hoursSet, bool minsSet, bool secsSet)
+void display::displayClock(int hr, int min, int sec, int iconSelect, bool flashClock, bool hoursSet, bool minsSet, bool secsSet, bool iconColor)
 {
-    cout << "Countdown clock: ";
+    cout << " Countdown clock: ";
     displayTimerIcon(iconSelect);
+    if (iconColor == true) {
+        if (colorSwitch == true) {
+            cout << ANSI_YELLW << "  ";
+        }
+        else cout << ANSI_GREEN << "  ";
+        colorSwitch = !colorSwitch;
+    }
+    else cout <<  "  ";
     if (flashClock == true) cout << ANSI_BLINK;
     cout << ANSI_GREEN;
     if (hoursSet == false) cout << "__:";
@@ -82,23 +91,35 @@ void display::displayTimerIcon(int handPosition)
 // Draw progress bar on screen
 void display::displayProgress(bool timerDone, int barPercent)
 {
-    cout << "Elapsed duration: " << barPercent << "%" << endl << "⦗";
+    cout << "   Elapsed duration: ";
+    if (barPercent < 10) cout << "  ";
+    if (barPercent < 100) cout << "  ";
+    cout << barPercent << "%" << endl;
+    cout << "   ⦗";
     for (int i = 0; i < 20; i++) {
         if (timerDone == false) {
-            if (i < barPercent / 5) cout << "⨁";
-            else cout << "🞄";
+            if (i < barPercent / 5) cout << ANSI_GREEN << "⨁";
+            else cout << ANSI_YELLW << "🞄";
         }
-        if (timerDone == true) {
-            if (i < barPercent / 5) cout << "🞅";
-            else cout << "🞅";
-        }
+        if (timerDone == true) cout << ANSI_GREEN << "🞅";
     }
-    cout << "⦘" << endl;
+    cout << ANSI_RESET << "⦘" << endl;
 }
 
 // Draw total timer seconds on screen
-void display::displaySecs(int totalSecs)
+void display::displaySecs(int startSecs, int remainSecs)
 {
-    cout << totalSecs << " seconds remaining. " << endl;
+    cout << "  "<< ANSI_GREEN;
+    if (startSecs < 10) cout << "🯰";
+    if (startSecs < 100) cout << "🯰";
+    if (startSecs < 1000) cout << "🯰";
+    if (startSecs < 10000) cout << "🯰";
+    cout << segmentDisplay(startSecs) << ANSI_RESET << " seconds at start" << endl;
+    cout << "  " << ANSI_GREEN;
+    if (remainSecs < 10) cout << "🯰";
+    if (remainSecs < 100) cout << "🯰";
+    if (remainSecs < 1000) cout << "🯰";
+    if (remainSecs < 10000) cout << "🯰";
+    cout << segmentDisplay(remainSecs) << ANSI_RESET << " seconds remaining" << endl;
 }
 
