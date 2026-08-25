@@ -1,6 +1,6 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.3       *
+ *     Version 1.1.4       *
  *  by Skyler Jax Hansen   *
  *     Aug. 21st, 2026     *
  ***************************/

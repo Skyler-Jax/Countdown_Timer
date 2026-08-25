@@ -1,6 +1,6 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.3       *
+ *     Version 1.1.4       *
  *  by Skyler Jax Hansen   *
  *     Aug. 21st, 2026     *
  ***************************/
@@ -30,9 +30,10 @@ void display::displayHeader()
     cout << ANSI_MGNTA;
     cout << " ╭─────────────────────────╮" << endl;
     cout << " │ Console Countdown Clock │" << endl;
+    cout << " │";
+    cout << ANSI_GREEN << "  ⓑⓨ🅢ⓚⓨⓛⓔⓡ🅙ⓐⓧ🅗ⓐⓝⓢⓔⓝ🄌🄯⓴㉖ ";
+    cout << ANSI_MGNTA << "│" << endl;
     cout << " ╰─────────────────────────╯" << endl;
-    cout << ANSI_GREEN;
-    cout << "    ⓑⓨ🅢ⓚⓨⓛⓔⓡ🅙ⓐⓧ🅗ⓐⓝⓢⓔⓝ🄌🄯⓴㉖" << endl << endl;
     cout << ANSI_RESET;
 }
 
@@ -92,8 +93,8 @@ void display::displayTimerIcon(int handPosition)
 void display::displayProgress(bool timerDone, int barPercent)
 {
     cout << "   Elapsed duration: ";
-    if (barPercent < 10) cout << "  ";
-    if (barPercent < 100) cout << "  ";
+    if (barPercent < 10) cout << " ";
+    if (barPercent < 100) cout << " ";
     cout << barPercent << "%" << endl;
     cout << "   ⦗";
     for (int i = 0; i < 20; i++) {
