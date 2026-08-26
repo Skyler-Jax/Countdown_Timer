@@ -105,16 +105,15 @@ void display::displaySecs(int startSecs, int remainSecs)
     if (startSecs < 1000) cout << "🯰";
     if (startSecs < 10000) cout << "🯰";
     cout << segmentDisplay(startSecs) << TEXT_RESET << " seconds at start" << endl;
-    cout << TEXT_FG_BLUE << "  ";
     if (startSecs < 3600) {
-        if (remainSecs < (startSecs * 0.25)) cout << TEXT_FG_RED << TEXT_BG_SLATE;
-        else if (remainSecs < (startSecs * 0.5)) cout << TEXT_FG_YELLW << TEXT_BG_SLATE;
-        else cout << TEXT_FG_GREEN << TEXT_BG_SLATE;
+        if (remainSecs < (startSecs * 0.25)) cout << TEXT_FG_RED << "  " << TEXT_BG_SLATE;
+        else if (remainSecs < (startSecs * 0.5)) cout << TEXT_FG_YELLW << "  " << TEXT_BG_SLATE;
+        else cout << TEXT_FG_GREEN << "  " << TEXT_BG_SLATE;
     }
     else {
-        if (remainSecs < 60) cout << TEXT_FG_RED << TEXT_BG_SLATE;
-        else if (remainSecs < 300) cout << TEXT_FG_YELLW << TEXT_BG_SLATE;
-        else cout << TEXT_FG_GREEN << TEXT_BG_SLATE;
+        if (remainSecs < 60) cout << TEXT_FG_RED << "  " << TEXT_BG_SLATE;
+        else if (remainSecs < 300) cout << TEXT_FG_YELLW << "  " << TEXT_BG_SLATE;
+        else cout << TEXT_FG_GREEN << "  " << TEXT_BG_SLATE;
     }
     if (remainSecs < 10) cout << "🯰";
     if (remainSecs < 100) cout << "🯰";
