@@ -1,15 +1,15 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.4       *
+ *     Version 1.1.5       *
  *  by Skyler Jax Hansen   *
- *     Aug. 21st, 2026     *
+ *     Aug. 25th, 2026     *
  ***************************/
 
 #include "variables.h"
 #include "functions.h"
 #include <iostream>
-#include <string>
 #include <chrono>
+#include <string>
 #include <thread>
 
 using namespace std;
@@ -20,7 +20,9 @@ using namespace timer;
 /*****************************
  * General Program Functions *
  *****************************/
-// Initialize/zero all app variables for clean timer restart
+
+//Step 1: Clear/initialize all variables to prepare for timer setup
+///////////////////////////////////////////////////////////////////
 void app::zeroVars()
 {
     hours = 0;
@@ -36,96 +38,40 @@ void app::zeroVars()
     secsAreSet = false;
     noteIsSet = false;
     showTimerNote = false;
-    resetTimer = false;
     iconColor = false;
     colorSwitch = false;
+    input.clear();
     option.clear();
 }
 
-// Function that starts the program
+//Step 2a: Get time values from user and initialize timerCore()
+///////////////////////////////////////////////////////////////
 void app::initApp()
 {
-    clearScreen(1);
+    clearScreen(true); //'true' resets screen with flashing timer clock display during setting
+
     if (hoursAreSet == false) hours = getHours();
+
+    //Convert entered hours into seconds
     hours2Secs = hours * 60 * 60;
+
     if (minsAreSet == false) mins = getMins();
+
+    //Converted entered minutes into seconds
     mins2Secs = mins * 60;
+
     if (secsAreSet == false) secs = getSecs();
+
+    //Store sum of hours2Secs + mins2Secs + secs for other functions' use
     totalSecs = hours2Secs + mins2Secs + secs;
+
+    iconColor = true; //Change icon timer color from white to green, indicates successful timer set routine
+
+    clearScreen(0); //'false' resets screen with solid timer clock display, used at all other times besides when setting
 }
 
-// Draw start message on screen and wait for Enter
-void app::wait2Start()
-{
-    cout << " Timer set, press Enter to start..." << endl << ANSI_GREEN << "  " << ANSI_RESET;
-    cin.ignore();
-    cin.get();
-}
-
-// Get timer reminder note from console input
-void app::getNote()
-{
-    cout << " Attach note to timer? (Y/N)" << endl << ANSI_YELLW << "   " << ANSI_RESET << ANSI_CSHOW;
-    cin >> option;
-    if (option == "Y" || option == "y") {
-        noteIsSet = !noteIsSet;
-        showTimerNote = !showTimerNote;
-        option.clear();
-        clearScreen(0);
-    }
-    else {
-        option.clear();
-        clearScreen(0);
-    }
-    if (noteIsSet == true) {
-        cout << " Enter reminder/note for this timer:" << endl << ANSI_BLUE << "   " << ANSI_RESET;
-        cin.ignore();
-        cin.get(note, 63);
-        clearScreen(0);
-    }
-}
-
-// Draw timer reminder/note
-void app::displayNote()
-{
-    if (showTimerNote == true) cout << endl << " Timer note:" << endl << ANSI_YELLW << "  " << ANSI_RESET << note << endl << endl;
-}
-
-// Draw timer complete notification on screen
-void app::timerExpired()
-{
-    iconColor = false;
-    cout << "   Timer has expired!  " << endl << endl;
-    for (int ringCount = 0; ringCount < 2; ringCount++) {
-        for (int bellCount = 0; bellCount < 4; bellCount++) {
-            cout << "\a" << flush;
-            this_thread::sleep_for(chrono::milliseconds(125));;
-        }
-        this_thread::sleep_for(chrono::milliseconds(750));
-    }
-}
-
-// Reset timer or quit
-void app::timerReset()
-{
-    cout << " R to   or Q to  " << endl << ANSI_YELLW << "   " << ANSI_RESET << ANSI_CSHOW;
-    cin >> option;
-    if (option == "Q" || option == "q") {
-        programActive = !programActive;
-        cout << ANSI_ERASE << flush;
-    }
-    else if (option == "R" || option == "r") {
-        zeroVars();
-        initApp();
-    }
-    else {
-        option.clear();
-        clearScreen(0);
-        timerReset();
-    }
-}
-
-// Check for valid numeric bool app::checkInput(const string& input)
+//Step 2b: Checks whether user entered valid positive integer to set time with
+//////////////////////////////////////////////////////////////////////////////
 bool app::checkInput(const string& input)
 {
     return !input.empty() && all_of(input.begin(), input.end(), [](unsigned char c) {
@@ -133,7 +79,46 @@ bool app::checkInput(const string& input)
     });
 }
 
-// Calculate progress bar step ratio from set duration
+//Step 3: Promp user for optional timer note/reminder
+/////////////////////////////////////////////////////
+void app::getNote()
+{
+    cout << " Attach note to timer? (Y/N)" << endl << TEXT_FG_AMBER << "   " << TEXT_RESET << CURSOR_SHOW;
+    cin >> option;
+    if (option == "Y" || option == "y") {       //Sets flag for next step of function to grab note text from user
+        noteIsSet = !noteIsSet;                 //
+        showTimerNote = !showTimerNote;         //Sets flag for displayNote() function to activate note output during countdown
+        option.clear();
+        clearScreen(false);
+    }
+    else if (option == "N" || option == "n") {  //Continues through program loop if no note desired
+        option.clear();
+        clearScreen(false);
+    }
+    else {                                      //Returns to top of getNote() with no valid input, in case of accidental skip-over
+        option.clear();
+        clearScreen(false);
+        getNote();
+    }
+    if (noteIsSet == true) {                    //Gets note text from user to store in note[64] character array
+        cout << " Enter reminder/note for this timer:" << endl << TEXT_FG_BLUE << "   " << TEXT_RESET;
+        cin.ignore();
+        cin.get(note, 63);
+        clearScreen(0);
+    }
+}
+
+//Step 4: Pause after gathering information, wait for user to start timer
+/////////////////////////////////////////////////////////////////////////
+void app::wait2Start()
+{
+    cout << " Timer set, press Enter to start..." << TEXT_FG_GREEN << TEXT_BLINK << "  " << TEXT_RESET;
+    cin.ignore();
+    cin.get();
+}
+
+//Step 5: Calculates appropriate bar segnemt:seconds ratio for progress bar
+///////////////////////////////////////////////////////////////////////////
 int app::calculateBarRatio()
 {
     int sum = 0;
@@ -149,19 +134,23 @@ int app::calculateBarRatio()
     return ratio;
 }
 
-// Translate ASCII digits to segmented digits
-string app::segmentDisplay(int input)
+//Step 6: Handle timer reset or program exit
+////////////////////////////////////////////
+void app::timerReset()
 {
-    const string symbols[] = {
-        "🯰", "🯱", "🯲", "🯳", "🯴",
-        "🯵", "🯶", "🯷", "🯸", "🯹"
-    };
-    string numStr = to_string(abs(input));
-    string result;
-    result.reserve(numStr.length() * 4);
-    for (char digit : numStr) {
-        result += symbols[digit - '0'];
+    cout << " R to   or Q to  " << endl << TEXT_FG_AMBER << "   " << TEXT_RESET << CURSOR_SHOW;
+    cin >> option;
+    if (option == "Q" || option == "q") {
+        programActive = !programActive;
+        cout << CONSOLE_CLEAR << flush;
     }
-    return result;
+    else if (option == "R" || option == "r") {
+        zeroVars();
+        initApp();
+    }
+    else {
+        option.clear();
+        clearScreen(0);
+        timerReset();
+    }
 }
-
