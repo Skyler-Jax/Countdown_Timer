@@ -1,13 +1,14 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.5       *
+ *     Version 1.1.6       *
  *  by Skyler Jax Hansen   *
- *     Aug. 25th, 2026     *
+ *     Aug. 27th, 2026     *
  ***************************/
 
-/********************
- * Screen Functions *
- ********************/
+/*********************
+ * Display Functions *
+ *********************/
+
 #include "variables.h"
 #include "functions.h"
 #include <iostream>
@@ -134,7 +135,7 @@ void display::displayNote()
 void display::timerExpired()
 {
     cout << "   Timer has expired!  " << endl << endl;
-    for (int ringCount = 0; ringCount < 2; ringCount++) {
+    for (int ring = 0; ring < ringCount; ring++) {
         for (int bellCount = 0; bellCount < 4; bellCount++) {
             cout << "\a" << flush;
             this_thread::sleep_for(chrono::milliseconds(125));;

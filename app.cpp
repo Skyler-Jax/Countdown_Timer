@@ -1,8 +1,8 @@
 /***************************
  * Console Countdown Timer *
- *     Version 1.1.5       *
+ *     Version 1.1.6       *
  *  by Skyler Jax Hansen   *
- *     Aug. 25th, 2026     *
+ *     Aug. 27th, 2026     *
  ***************************/
 
 #include "variables.h"
@@ -33,10 +33,12 @@ void app::zeroVars()
     hours2Secs = 0;
     mins2Secs = 0;
     totalSecs = 0;
+    ringCount = 2;
+    timerWait = true;
     hoursAreSet = false;
     minsAreSet = false;
     secsAreSet = false;
-    noteIsSet = false;
+    bypassGetNote = false;
     showTimerNote = false;
     iconColor = false;
     colorSwitch = false;
@@ -48,26 +50,27 @@ void app::zeroVars()
 ///////////////////////////////////////////////////////////////
 void app::initApp()
 {
-    clearScreen(true); //'true' resets screen with flashing timer clock display during setting
+    clearScreen(true);
 
     if (hoursAreSet == false) hours = getHours();
 
-    //Convert entered hours into seconds
+    //Convert entered hours into seconds for total timer seconds calculation
     hours2Secs = hours * 60 * 60;
 
     if (minsAreSet == false) mins = getMins();
 
-    //Converted entered minutes into seconds
+    //Converted entered minutes into seconds for total timer seconds calculation
     mins2Secs = mins * 60;
 
     if (secsAreSet == false) secs = getSecs();
 
-    //Store sum of hours2Secs + mins2Secs + secs for other functions' use
+    //Store sum of hours2Secs + mins2Secs + secs for total timer seconds calculation
     totalSecs = hours2Secs + mins2Secs + secs;
 
-    iconColor = true; //Change icon timer color from white to green, indicates successful timer set routine
+    //Change icon timer color from white to green, indicates successful timer set routine
+    iconColor = true;
 
-    clearScreen(0); //'false' resets screen with solid timer clock display, used at all other times besides when setting
+    clearScreen(false);
 }
 
 //Step 2b: Checks whether user entered valid positive integer to set time with
@@ -83,6 +86,7 @@ bool app::checkInput(const string& input)
 /////////////////////////////////////////////////////
 void app::getNote()
 {
+    bool noteIsSet = false;
     cout << " Attach note to timer? (Y/N)" << endl << TEXT_FG_AMBER << "   " << TEXT_RESET << CURSOR_SHOW;
     cin >> option;
     if (option == "Y" || option == "y") {       //Sets flag for next step of function to grab note text from user
