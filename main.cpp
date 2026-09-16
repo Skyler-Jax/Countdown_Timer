@@ -1,9 +1,15 @@
 /***************************
  * Console Countdown Clock *
- *     Version 1.2.0       *
+ *     Version 1.2.1       *
  *  by Skyler Jax Hansen   *
- *     Sep. 4th, 2026      *
+ *     Sep. 15th, 2026     *
  ***************************/
+
+/*
+ * This file contains the main function including CLI11
+ * command-line argument parsing, and all supporting
+ * preprocessor directives.
+ */
 
 #include "variables.h"
 #include "functions.h"

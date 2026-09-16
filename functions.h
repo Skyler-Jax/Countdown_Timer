@@ -1,20 +1,18 @@
 /***************************
  * Console Countdown Clock *
- *     Version 1.2.0       *
+ *     Version 1.2.1       *
  *  by Skyler Jax Hansen   *
- *     Sep. 4th, 2026      *
+ *     Sep. 15th, 2026     *
  ***************************/
 
-#pragma once
+/*
+ * This file contains program namespaces and their
+ * functions, and relevant preprocessor directives.
+ */
 
+#pragma once
 #include <string>
 
-using namespace std;
-
-/************************
- * Namespace & Function *
- *     Declarations     *
- ************************/
 namespace app                               // Program initialization and setup functions
 {                                           //
     void zeroVars();                        // Step 1: Clear/initialize all variables to prepare for timer setup
@@ -43,7 +41,7 @@ namespace timer                     // Time setting and tracking functions
 namespace display                                                   // Screen handling/display functions
 {                                                                   //
     void clearScreen(bool timerSetMode);                            // Clears console, initiates redrawing program header and timer display
-    void displayHeader();                                           // Called by clearScreen(), redraws header
+    void drawHeader();                                              // Called by clearScreen(), redraws header
     void displayClock(int hr, int min, int sec, int iconSelect,     // Called by clearScreen(), redraws current timer
                       bool flashClock, bool hoursSet,               //
                       bool minsSet, bool secsSet, bool iconColor);  //
@@ -52,6 +50,6 @@ namespace display                                                   // Screen ha
     void displayNote();                                             // Displays optional note/reminder while timer is running
     void timerExpired();                                            // Displays timer expired message and handles ringing terminal bell
     void timerPaused();                                             // Displays timer expired message and handles ringing terminal bell
-    string statusIcon(int input);                                   // Returns status icon from look-up array
-    string segmentDisplay(int input);                               // Returns sylized digit symbol from ASCII numeral translation
+    std::string statusIcon(int input);                              // Returns status icon from look-up array
+    std::string segmentDisplay(int input);                          // Returns sylized digit symbol from ASCII numeral translation
 }

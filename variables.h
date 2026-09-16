@@ -1,20 +1,19 @@
 /***************************
  * Console Countdown Clock *
- *     Version 1.2.0       *
+ *     Version 1.2.1       *
  *  by Skyler Jax Hansen   *
- *     Sep. 4th, 2026      *
+ *     Sep. 15th, 2026     *
  ***************************/
 
-#pragma once
+/*
+ * This file contains the global program variables
+ * and relevant preprocessor directives.
+ */
 
+#pragma once
 #include <string>
-#include <atomic>
 
 using namespace std;
-
-/****************************
- * Global Program Variables *
- ****************************/
 inline int hours;           // User-entered total hours
 inline int mins;            // User-entered total minutes
 inline int secs;            // User-entered total seconds
@@ -31,6 +30,7 @@ inline bool programActive;  // Keeps the main loop running until user opts to qu
 inline bool timerEnabled;   // Whether the timer is allowed to run or is paused
 inline bool appInitialized; // Whether the program has been properly initialized
 inline bool cleanStart;     // Tells timerCore() whether it was called into a clean start or called to resume from pause
+inline bool timerRunning;   // Indicates that timer is set and running
 inline bool timerHasExpired;// Indicates that timer naturally expired
 inline bool timerWait;      // Whether the wait-to-start prompt is enabled or not
 inline bool hoursAreSet;    // Hooks the main program loop to call getHours() if hours are not yet set
@@ -43,19 +43,3 @@ inline bool colorSwitch;    // Cycles timer icon color while timer running
 inline char note[64];       // Character array for holding user's note
 inline string input;        // String to hold user's numeric input
 inline string option;       // String to hold user's option input
-
-/****************************
- * Global Program Constants *
- ****************************/
-inline const string TEXT_FG_MGNTA   = "\033[38;5;207m"; // Console output escape code for magenta colored characters
-inline const string TEXT_FG_BLUE    = "\033[38;5;69m";  // Console output escape code for blue colored characters
-inline const string TEXT_FG_GREEN   = "\033[38;5;46m";  // Console output escape code for green colored characters
-inline const string TEXT_FG_YELLW   = "\033[38;5;226m"; // Console output escape code for yellow colored characters
-inline const string TEXT_FG_AMBER   = "\033[38;5;208m"; // Console output escape code for amber colored characters
-inline const string TEXT_FG_RED     = "\033[38;5;196m"; // Console output escape code for red colored characters
-inline const string TEXT_BG_SLATE   = "\033[48;5;236m"; // Console output escape code for gray colored background
-inline const string TEXT_BLINK      = "\033[5m";        // Console output escape code for blinking test
-inline const string TEXT_RESET      = "\033[0m";        // Console output escape code for resetting formatting
-inline const string CONSOLE_CLEAR   = "\033[2J\033[H";  // Console output escape code for clearing the screen
-inline const string CURSOR_HIDE     = "\033[?25l";      // Console output escape code for hiding the cursor
-inline const string CURSOR_SHOW     = "\033[?25h";      // Console output escape code for showing the cursor

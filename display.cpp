@@ -1,19 +1,21 @@
 /***************************
  * Console Countdown Clock *
- *     Version 1.2.0       *
+ *     Version 1.2.1       *
  *  by Skyler Jax Hansen   *
- *     Sep. 4th, 2026      *
+ *     Sep. 15th, 2026     *
  ***************************/
 
-/*********************
- * Display Functions *
- *********************/
+/*
+ * This file contains functions specifically handling
+ * display and console output, and all supporting
+ * preprocessor directives.
+ */
 
 #include "variables.h"
 #include "functions.h"
+#include "interface.h"
 #include <iostream>
 #include <string>
-#include <chrono>
 #include <thread>
 
 using namespace std;
@@ -23,13 +25,13 @@ using namespace app;
 ///////////////////////////////////////////////////////////////////////
 void display::clearScreen(bool timerSetMode) {
     cout << CONSOLE_CLEAR << CURSOR_HIDE << flush;
-    displayHeader();
+    drawHeader();
     displayClock(hours, mins, secs, clockHands, timerSetMode, hoursAreSet, minsAreSet, secsAreSet, iconColor);
 }
 
 // Called by clearScreen(), redraws header
 //////////////////////////////////////////
-void display::displayHeader() {
+void display::drawHeader() {
     cout << TEXT_BG_SLATE;
     cout << TEXT_FG_AMBER;
     cout << " ╭─────────────────────────╮ " << endl;
@@ -49,31 +51,53 @@ void display::displayClock(int hr, int min, int sec, int iconSelect, bool flashC
     cout << " Countdown clock: ";
     cout << statusIcon(iconSelect) << endl;
 
-    if (iconColor == true) {
-        if (colorSwitch == true) cout << TEXT_FG_YELLW << "  ";
-        else cout << TEXT_FG_GREEN << "  ";
-    } else cout <<  "  ";
+    if (iconColor) {
+        if (colorSwitch) {
+            cout << TEXT_FG_AMBER << "  ";
+        } else {
+            cout << TEXT_FG_GREEN << "  ";
+        }
+    } else {
+        cout <<  "  ";
+    }
 
     cout << TEXT_BG_SLATE;
 
-    if (flashClock == true) cout << TEXT_BLINK;
+    if (flashClock) {
+        cout << TEXT_BLINK;
+    }
 
     cout << TEXT_FG_GREEN;
 
-    if (hoursSet == false) cout << "__:";
-    else if (hoursSet == true) {
+    if (timerRunning) {
+        if (startSecs >= 60 && totalSecs <= 15) {
+            cout << TEXT_BLINK;
+        }
+        if (startSecs >= 1800 && totalSecs <= 300) {
+            cout << TEXT_BLINK;
+        }
+        if (startSecs >= 3600 && totalSecs <= 600) {
+            cout << TEXT_BLINK;
+        }
+    }
+
+    if (!hoursSet) {
+        cout << "__:";
+    } else if (hoursSet) {
         if (hr < 10) cout << "🯰";
         cout << segmentDisplay(hr) << ":";
     }
 
-    if (minsSet == false) cout << "__:";
-    else if (minsSet == true) {
+    if (!minsSet) {
+        cout << "__:";
+    } else if (minsSet) {
         if (min < 10) cout << "🯰";
         cout << segmentDisplay(min) << ":";
     }
 
-    if (secsSet == false) cout << "__" << endl << endl;
-    else if (secsSet == true) {
+    if (!secsSet) {
+        cout << "__" << endl << endl;
+    } else if (secsSet) {
         if (sec < 10) cout << "🯰";
         cout << segmentDisplay(sec) << endl << endl;
     }
@@ -86,20 +110,29 @@ void display::displayClock(int hr, int min, int sec, int iconSelect, bool flashC
 void display::displayProgress(bool timerDone, int barPercent) {
     cout << "   Elapsed duration: ";
 
-    if (barPercent < 10) cout << " ";
+    if (barPercent < 10) {
+        cout << " ";
+    }
 
-    if (barPercent < 100) cout << " ";
+    if (barPercent < 100) {
+        cout << " ";
+    }
 
     cout << barPercent << "%" << endl;
     cout <<  "   ⦗";
 
     for (int i = 0; i < 20; i++) {
-        if (timerDone == false) {
-            if (i < barPercent / 5) cout << TEXT_FG_GREEN << "🞅";
-            else cout << TEXT_FG_AMBER << "🞄";
+        if (!timerDone) {
+            if (i < barPercent / 5) {
+                cout << TEXT_FG_GREEN << "🞅";
+            } else {
+                cout << TEXT_FG_AMBER << "🞄";
+            }
         }
 
-        if (timerDone == true) cout << TEXT_FG_GREEN << "⨁";
+        if (timerDone) {
+            cout << TEXT_FG_GREEN << "⨁";
+        }
     }
 
     cout << TEXT_RESET << "⦘" << endl;
@@ -112,31 +145,55 @@ void display::displaySecs(int startSecs, int remainSecs) {
 
     // Code block pads starting seconds value with 0 to keep position fixed
     {
-    if (startSecs < 10) cout << "🯰";
-    if (startSecs < 100) cout << "🯰";
-    if (startSecs < 1000) cout << "🯰";
-    if (startSecs < 10000) cout << "🯰";
+        if (startSecs < 10) {
+            cout << "🯰";
+        }
+        if (startSecs < 100) {
+            cout << "🯰";
+        }
+        if (startSecs < 1000) {
+            cout << "🯰";
+        }
+        if (startSecs < 10000) {
+            cout << "🯰";
+        }
     }
 
     cout << segmentDisplay(startSecs) << TEXT_RESET << " seconds at start" << endl;
 
     // Handle the color switching for remaining seconds
     if (startSecs < 3600) {
-        if (remainSecs < (startSecs * 0.25)) cout << TEXT_FG_RED << "  " << TEXT_BG_SLATE;
-        else if (remainSecs < (startSecs * 0.5)) cout << TEXT_FG_YELLW << "  " << TEXT_BG_SLATE;
-        else cout << TEXT_FG_GREEN << "  " << TEXT_BG_SLATE;
+        if (remainSecs < (startSecs * 0.25)) {
+            cout << TEXT_FG_RED << "  " << TEXT_BG_SLATE;
+        } else if (remainSecs < (startSecs * 0.5)) {
+            cout << TEXT_FG_YELLW << "  " << TEXT_BG_SLATE;
+        } else {
+            cout << TEXT_FG_GREEN << "  " << TEXT_BG_SLATE;
+        }
     } else {
-        if (remainSecs < 60) cout << TEXT_FG_RED << "  " << TEXT_BG_SLATE;
-        else if (remainSecs < 300) cout << TEXT_FG_YELLW << "  " << TEXT_BG_SLATE;
-        else cout << TEXT_FG_GREEN << "  " << TEXT_BG_SLATE;
+        if (remainSecs < 60) {
+            cout << TEXT_FG_RED << "  " << TEXT_BG_SLATE;
+        } else if (remainSecs < 300) {
+            cout << TEXT_FG_YELLW << "  " << TEXT_BG_SLATE;
+        } else {
+            cout << TEXT_FG_GREEN << "  " << TEXT_BG_SLATE;
+        }
     }
 
     // Code block pads remaining seconds value with 0 to keep position fixed
     {
-    if (remainSecs < 10) cout << "🯰";
-    if (remainSecs < 100) cout << "🯰";
-    if (remainSecs < 1000) cout << "🯰";
-    if (remainSecs < 10000) cout << "🯰";
+        if (remainSecs < 10) {
+            cout << "🯰";
+        }
+        if (remainSecs < 100) {
+            cout << "🯰";
+        }
+        if (remainSecs < 1000) {
+            cout << "🯰";
+        }
+        if (remainSecs < 10000) {
+            cout << "🯰";
+        }
     }
 
     cout << segmentDisplay(remainSecs) << TEXT_RESET << " seconds remaining" << endl;
@@ -154,7 +211,7 @@ void display::displayNote() {
 // Displays timer expired message and handles ringing terminal bell and timer reset
 ///////////////////////////////////////////////////////////////////////////////////
 void display::timerExpired() {
-    cout << "   Timer has expired!  " << endl << endl;
+    cout << "   Timer has expired! 🏁 " << endl << endl;
     for (int ring = 0; ring < ringCount; ring++) {
         for (int bellCount = 0; bellCount < 4; bellCount++) {
             cout << "\a" << flush;
@@ -181,9 +238,12 @@ void display::timerPaused()
 /////////////////////////////////////////
 string display::statusIcon(int input) {
     const string icons[] = {
-        "🖮", "🕐", "🕑", "🕒", "🕓",
-        "🕔", "🕕", "🕖", "🕗", "🕘",
-        "🕙", "🕚", "🕛", "✅"
+        "⌨️", "🕛", "🕧", "🕐", "🕜",
+        "🕑", "🕝", "🕒", "🕞", "🕓",
+        "🕟", "🕔", "🕠", "🕕", "🕡",
+        "🕖", "🕢", "🕗", "🕣", "🕘",
+        "🕤", "🕙", "🕥", "🕚", "🕦",
+        "✅"
     };
 
     string iconReturn = icons[input];

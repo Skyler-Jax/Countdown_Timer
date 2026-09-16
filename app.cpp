@@ -1,21 +1,24 @@
 /***************************
  * Console Countdown Clock *
- *     Version 1.2.0       *
+ *     Version 1.2.1       *
  *  by Skyler Jax Hansen   *
- *     Sep. 4th, 2026      *
+ *     Sep. 15th, 2026     *
  ***************************/
+
+/*
+ * This file contains functions relating to the program's
+ * elements and operation, and all supporting preprocessor
+ * directives.
+ */
 
 #include "variables.h"
 #include "functions.h"
+#include "interface.h"
 #include <iostream>
-#include <chrono>
-#ifdef _WIN32
-#include <conio.h>
-#else
+#include <algorithm>
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
-#endif
 
 using namespace std;
 using namespace app;
@@ -42,6 +45,7 @@ void app::zeroVars() {
     timerEnabled    = true;
     appInitialized  = false;
     cleanStart      = true;
+    timerRunning    = false;
     timerHasExpired = false;
     timerWait       = true;
     hoursAreSet     = false;
@@ -148,16 +152,23 @@ int app::calculateBarRatio() {
     int ratio = 0;
 
     // Round up seconds used in bar ratio so the quotient is cleanly divisible
-    {
-    if (secs > 0 && secs < 10) sum = hours2Secs + mins2Secs + 10;
-    if (secs > 10 && secs < 20) sum = hours2Secs + mins2Secs + 20;
-    if (secs > 20 && secs < 30) sum = hours2Secs + mins2Secs + 30;
-    if (secs > 30 && secs < 40) sum = hours2Secs + mins2Secs + 40;
-    if (secs > 40 && secs < 50) sum = hours2Secs + mins2Secs + 50;
-    if (secs > 50 && secs < 60) sum = hours2Secs + mins2Secs + 60;
-    else sum = hours2Secs + mins2Secs + secs;
+    if (secs > 0 && secs < 10) {
+        sum = hours2Secs + mins2Secs + 10;
+    } else if (secs > 10 && secs < 20) {
+        sum = hours2Secs + mins2Secs + 20;
+    } else if (secs > 20 && secs < 30) {
+        sum = hours2Secs + mins2Secs + 30;
+    } else if (secs > 30 && secs < 40) {
+        sum = hours2Secs + mins2Secs + 40;
+    } else if (secs > 40 && secs < 50) {
+        sum = hours2Secs + mins2Secs + 50;
+    } else if (secs > 50 && secs < 60) {
+        sum = hours2Secs + mins2Secs + 60;
+    } else {
+        sum = hours2Secs + mins2Secs + secs;
     }
 
+    // Calculate and return ratio
     ratio = sum / 20;
     return ratio;
 }
@@ -169,10 +180,14 @@ void app::runTimer() {
     initApp();
 
     //Prompts user whether to add/enable optional note/reminder message
-    if (!bypassGetNote) getNote();
+    if (!bypassGetNote) {
+        getNote();
+    }
 
     //Prompts user to start timer when setup completes successfully
-    if (timerWait) wait2Start();
+    if (timerWait) {
+        wait2Start();
+    }
 
     //Runs the timer core logic; sub-functions increment/decrement counters and sync visual elements
     timerCore();
@@ -181,17 +196,6 @@ void app::runTimer() {
 // Step 6b: Listen for keypress to pause active timer
 ////////////////////////////////////////////
 bool app::pauseTimer() {
-
-    // Windows implementation
-    #ifdef _WIN32
-    if (_kbhit()) {
-        _getch();
-        return true;
-    }
-    return false;
-
-    // *nix implementation
-    #else
     struct termios oldt, newt;
     int ch;
     int oldf;
@@ -221,7 +225,6 @@ bool app::pauseTimer() {
     }
 
     return false;
-    #endif
 }
 
 // Step 7a: Handle timer reset or program exit after expiration
@@ -240,6 +243,7 @@ void app::resetTimer() {
         runTimer();
     } else {
         option.clear();
+        cin.clear();
         clearScreen(false);
         ringCount = 0;
         timerExpired();
@@ -264,6 +268,7 @@ void app::restartTimer() {
         timerCore();
     } else {
         option.clear();
+        cin.clear();
         clearScreen(false);
         timerPaused();
     }
